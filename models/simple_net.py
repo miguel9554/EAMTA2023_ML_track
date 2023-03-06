@@ -38,7 +38,8 @@ class ConvNet(nn.Module):
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=8, kernel_size=3)
         self.pool = nn.MaxPool2d(2, 2)
         self.conv2 = nn.Conv2d(in_channels=8, out_channels=16, kernel_size=4)
-        self.fc1 = nn.Linear(6 * 6 * 16, 120)
+        self.conv3 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3)
+        self.fc1 = nn.Linear(2 * 2 * 32, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
@@ -47,11 +48,14 @@ class ConvNet(nn.Module):
         # self.conv1(img) 32-3+1 = 30
         # self.pool(2,2) 30/2 = 15
         x = self.pool(self.relu(self.conv2(x)))
-        # self.conv1(img) 15-4+1 = 12
+        x = self.pool(self.relu(self.conv3(x)))
+        # self.conv2(img) 15-4+1 = 12
         # self.pool(img) 12/2 = 6
+        # self.conv3(img) 6-3+1 = 4
+        # self.pool(img) 4/2 = 2
         # print(x.size())
         # x = torch.flatten(x, 1)
-        x = x.view(-1, 6*6*16)
+        x = x.view(-1, 2*2*32)
         # print(x.size())
         # 16 channels 6*6
         x = self.relu(self.fc1(x))
