@@ -43,8 +43,10 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     # tensor, y luego se normalizan con media y desviación estándar de 0.5
 
     transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+        [
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
     )
 
 
