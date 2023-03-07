@@ -20,6 +20,7 @@ import torchvision.transforms as transforms
 from models import ConvNet
 from plot_training import plot_training
 import os
+import time
 
 
 if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
@@ -47,12 +48,11 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
          transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
     )
 
-
     train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
     test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform)
 
-    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4)
+    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4)
 
     classes = train_set.classes
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -60,7 +60,7 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     net = ConvNet(batch_size)
     net = net.to(device)
 
-    info = summary(net, (3, 32, 32))
+    info = summary(net, (batch_size, 3, 32, 32))
     print(info)
     ########################################################################################################################
     # Optimizer
@@ -76,9 +76,11 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
                          'train_loss': [],
                          'test_loss': [],
                          'epoch_count': []}
-
+    training_times = []
+    print_time = lambda t: f"{int(t) // 60:02d}:{int(t) % 60:02d}"
 
     for epoch in range(epochs):  # loop over the dataset multiple times
+        start_time = time.time()
         # Inicializo variables cada vez que comienza una nueva época
         running_loss = 0.0
         train_correct = 0
@@ -159,5 +161,16 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
                                                                                     training_progress['test_loss'][-1]))
         print(90 * '=')
         plot_training(training_progress)
+        end_time = time.time()
+        training_time = end_time - start_time
+        training_times.append(training_time)
+        print(f'Epoch training time: {print_time(training_time)}')
+        print(90 * '=')
     print('TRAINING FINISHED')
     print(90 * '=')
+    total_train_time = sum(training_times)
+    average_train_time = total_train_time/len(training_times)
+    print(f'Total training time: {print_time(total_train_time)}')
+    print(f'Average epoch training time: {print_time(average_train_time)}')
+    print(90 * '=')
+
