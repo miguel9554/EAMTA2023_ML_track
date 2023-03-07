@@ -46,6 +46,10 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
 
     transform = transforms.Compose([
         transforms.ToTensor(),
+        transforms.RandomRotation(90),
+        transforms.ColorJitter(),
+        transforms.GaussianBlur(3),
+        transforms.RandomHorizontalFlip(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
 
