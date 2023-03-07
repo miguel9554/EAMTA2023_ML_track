@@ -28,8 +28,8 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     ########################################################################################################################
     # Parámetros
     ########################################################################################################################
-    batch_size = 10
-    epochs = 10
+    batch_size = 32
+    epochs = 20
 
     ########################################################################################################################
 
@@ -44,17 +44,21 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     # Es una cadena de operaciones que se aplica a cada muestra del dataset. En este caso, las imágenes se transforman a
     # tensor, y luego se normalizan con media y desviación estándar de 0.5
 
-    transform = transforms.Compose([
+    transform_train = transforms.Compose([
         transforms.ToTensor(),
-        transforms.RandomRotation(90),
-        transforms.ColorJitter(),
-        transforms.GaussianBlur(3),
         transforms.RandomHorizontalFlip(),
+        transforms.RandomVerticalFlip(),
+        # transforms.ColorJitter(),
         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
     ])
 
-    train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
-    test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform)
+    transform_test = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+    ])
+
+    train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform_train)
+    test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform_test)
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=4)
     test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4)
