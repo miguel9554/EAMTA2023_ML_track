@@ -39,33 +39,33 @@ class ConvNet(nn.Module):
         self.pool_wo_stride = nn.MaxPool2d(2, 1)
 
         conv1_channels = 32
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=conv1_channels, kernel_size=3)
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=conv1_channels, kernel_size=3, padding=1)
         self.batch1 = nn.BatchNorm2d(conv1_channels)
 
         conv2_channels = 64
-        self.conv2 = nn.Conv2d(in_channels=conv1_channels, out_channels=conv2_channels, kernel_size=2)
+        self.conv2 = nn.Conv2d(in_channels=conv1_channels, out_channels=conv2_channels, kernel_size=3, padding=1)
         self.batch2 = nn.BatchNorm2d(conv2_channels)
 
         conv3_channels = 128
-        self.conv3 = nn.Conv2d(in_channels=conv2_channels, out_channels=conv3_channels, kernel_size=3)
+        self.conv3 = nn.Conv2d(in_channels=conv2_channels, out_channels=conv3_channels, kernel_size=3, padding=1)
         self.batch3 = nn.BatchNorm2d(conv3_channels)
 
-        self.fc1 = nn.Linear(6 * 6 * 128, 120)
+        self.fc1 = nn.Linear(4 * 4 * 128, 120)
         self.fc2 = nn.Linear(120, 84)
         self.fc3 = nn.Linear(84, 10)
 
     def forward(self, img):
-        x = self.pool_wo_stride(self.relu(self.batch1(self.conv1(img))))
-        # self.conv1(img) 32-3+1 = 30
-        # self.pool(2,2) 30-1 = 29
+        x = self.pool_w_stride(self.relu(self.batch1(self.conv1(img))))
+        # self.conv1(img) 32-3+1+2 = 32
+        # self.pool(2,2) 32/2 = 16
         x = self.pool_w_stride(self.relu(self.batch2(self.conv2(x))))
-        # self.conv1(img) 29-2+1 = 28
-        # self.pool(img) 28/1 = 14
+        # self.conv1(img) 31-3+1+2 = 16
+        # self.pool(img) 16/2 = 8
         x = self.pool_w_stride(self.relu(self.batch3(self.conv3(x))))
-        # self.conv1(img) 14-2+1 = 12
-        # self.pool(img) 12/2 = 6
+        # self.conv1(img) 8-2+1+2 = 8
+        # self.pool(img) 8/2 = 4
         # x = torch.flatten(x, 1)
-        x = x.view(-1, 6 * 6 * 128)
+        x = x.view(-1, 4 * 4 * 128)
         # print(x.size())
         # 16 channels 6*6
         x = self.relu(self.fc1(x))
