@@ -26,8 +26,8 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     ########################################################################################################################
     # Parámetros
     ########################################################################################################################
-    batch_size = 10
-    epochs = 10
+    batch_size = 64
+    epochs = 20
 
     ########################################################################################################################
 
@@ -42,16 +42,23 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     # Es una cadena de operaciones que se aplica a cada muestra del dataset. En este caso, las imágenes se transforman a
     # tensor, y luego se normalizan con media y desviación estándar de 0.5
 
-    transform = transforms.Compose(
+    transform_train = transforms.Compose(
         [
+            #transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
+    )
+    transform_test = transforms.Compose(
+        [
+
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
     )
 
-
-    train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
-    test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform)
+    train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform_train)
+    test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform_test)
 
     train_loader = DataLoader(train_set, batch_size=batch_size, shuffle=True, num_workers=2)
     test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=2)
@@ -62,7 +69,7 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     net = ConvNet(batch_size)
     net = net.to(device)
 
-    info = summary(net, (3, 32, 32))
+    info = summary(net, (batch_size,3, 32, 32))
     print(info)
     ########################################################################################################################
     # Optimizer
@@ -160,6 +167,6 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
             ' ' * 7 + '| Train Loss:      {:6.4f} | Test Loss:      {:6.4f}'.format(training_progress['train_loss'][-1],
                                                                                     training_progress['test_loss'][-1]))
         print(90 * '=')
-    plot_training(training_progress)
+        plot_training(training_progress)
     print('TRAINING FINISHED')
     print(90 * '=')
