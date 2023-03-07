@@ -42,10 +42,12 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     # Es una cadena de operaciones que se aplica a cada muestra del dataset. En este caso, las imágenes se transforman a
     # tensor, y luego se normalizan con media y desviación estándar de 0.5
 
-    transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-    )
+    torch.manual_seed(17)
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        transforms.ColorJitter(),
+    ])
 
 
     train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
