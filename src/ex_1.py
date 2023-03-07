@@ -160,6 +160,6 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
             ' ' * 7 + '| Train Loss:      {:6.4f} | Test Loss:      {:6.4f}'.format(training_progress['train_loss'][-1],
                                                                                     training_progress['test_loss'][-1]))
         print(90 * '=')
-        plot_training(training_progress)
+    plot_training(training_progress)
     print('TRAINING FINISHED')
     print(90 * '=')
