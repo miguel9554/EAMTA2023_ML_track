@@ -21,6 +21,7 @@ from models import ConvNet
 from plot_training import plot_training
 import os
 import time
+from datetime import datetime
 
 
 if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
@@ -43,10 +44,10 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     # Es una cadena de operaciones que se aplica a cada muestra del dataset. En este caso, las imágenes se transforman a
     # tensor, y luego se normalizan con media y desviación estándar de 0.5
 
-    transform = transforms.Compose(
-        [transforms.ToTensor(),
-         transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))]
-    )
+    transform = transforms.Compose([
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+    ])
 
     train_set = torchvision.datasets.CIFAR10(root=dataset_path, train=True, download=True, transform=transform)
     test_set = torchvision.datasets.CIFAR10(root=dataset_path, train=False, download=True, transform=transform)
@@ -71,11 +72,13 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
     ########################################################################################################################
     # Defino diccionario para almacenar el progreso del entrenamiento
 
-    training_progress = {'train_accuracy': [],
-                         'test_accuracy': [],
-                         'train_loss': [],
-                         'test_loss': [],
-                         'epoch_count': []}
+    training_progress = {
+        'train_accuracy': [],
+        'test_accuracy': [],
+        'train_loss': [],
+        'test_loss': [],
+        'epoch_count': [],
+    }
     training_times = []
     print_time = lambda t: f"{int(t) // 60:02d}:{int(t) % 60:02d}"
 
@@ -92,6 +95,7 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
         ####################################################################################################################
         # Train Loop
         ####################################################################################################################
+        net.train()
         for i, data in enumerate(train_loader, 0):
             # get the inputs; data is a list of [inputs, labels]
             inputs, labels = data[0].to(device), data[1].to(device)
@@ -129,6 +133,7 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
         total = 0
         running_loss = 0.0
 
+        net.eval()
         with torch.no_grad():
             for data in test_loader:
                 inputs, labels = data[0].to(device), data[1].to(device)
@@ -164,13 +169,13 @@ if __name__ == '__main__': # -> Necesario solo para ejecutar en windows.
         end_time = time.time()
         training_time = end_time - start_time
         training_times.append(training_time)
-        print(f'Epoch training time: {print_time(training_time)}')
+        print(f'{datetime.now()} -> Epoch training time: {print_time(training_time)}')
         print(90 * '=')
     print('TRAINING FINISHED')
     print(90 * '=')
     total_train_time = sum(training_times)
     average_train_time = total_train_time/len(training_times)
-    print(f'Total training time: {print_time(total_train_time)}')
-    print(f'Average epoch training time: {print_time(average_train_time)}')
+    print(f'{datetime.now()} -> Total training time: {print_time(total_train_time)}')
+    print(f'{datetime.now()} -> Average epoch training time: {print_time(average_train_time)}')
     print(90 * '=')
 
